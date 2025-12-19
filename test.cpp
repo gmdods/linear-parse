@@ -2,17 +2,45 @@
 // Linear-parse
 
 #include "linear.hpp"
-#include <algorithm>
 
 int main(void) {
+	{ // balanced parentheses
+		auto tape = linear::parse("{{(()[])}{}}");
+		auto expect = linear::tape_t{
+			{{'{', 6}, {'{', 5}, {'(', 5}, {'(', 4}, {'[', 5}, {'{', 6}},
+			{},
+		};
+		assert(tape == expect);
+	}
 
-	auto tape = linear::parse("{{(()[])}{}}");
+	{ // strings
+		auto tape = linear::parse("[\"0\\\"1\\\\2\"]");
+		auto expect = linear::tape_t{
+			{
+				{'[', 2},
+				{'"', 0},
+			},
+			{"0\"1\\2\0", 6},
+		};
+		assert(tape == expect);
+	}
 
-	auto expect = linear::tape_t{
-		{'{', 6}, {'{', 5}, {'(', 5}, {'(', 4}, {'[', 5}, {'{', 6},
-	};
-	assert(
-		std::equal(tape.cbegin(), tape.cend(), expect.cbegin(), expect.cend()));
+	{ // lispy
+		auto tape = linear::parse("{\"a\" 4 \"b\" [1 2]}");
+		auto expect = linear::tape_t{
+			{
+				{'{', 7},
+				{'"', 0},
+				{'0', 4},
+				{'"', 2},
+				{'[', 7},
+				{'0', 1},
+				{'0', 2},
+			},
+			{"a\0b\0", 4},
+		};
+		assert(tape == expect);
+	}
 
 	return 0;
 }

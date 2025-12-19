@@ -7,6 +7,7 @@
 #include <array>
 #include <cassert>
 #include <cstdint>
+#include <string>
 #include <vector>
 
 namespace linear {
@@ -18,7 +19,15 @@ struct item_t {
 	bool operator<=>(const item_t&) const noexcept = default;
 };
 
-using tape_t = std::vector<item_t>;
+using tree_t = std::vector<item_t>;
+
+struct tape_t {
+	tree_t tree;
+	std::string text;
+
+	bool operator==(const tape_t&) const noexcept = default;
+	bool operator!=(const tape_t&) const noexcept = default;
+};
 
 template <uint8_t A, uint8_t... Args>
 struct index;
@@ -73,16 +82,16 @@ struct delim_t {
 	}
 
 	template <uint8_t A>
-	void open(tape_t& tape) {
-		tape.push_back({A, get<A>()});
-		get<A>() = tape.size() - 1;
+	void open(tree_t& tree) {
+		tree.push_back({A, get<A>()});
+		get<A>() = tree.size() - 1;
 	}
 
 	template <uint8_t A>
-	void close(tape_t& tape) {
+	void close(tree_t& tree) {
 		assert(balanced<A>());
-		auto mark = tape[get<A>()].index;
-		tape[get<A>()].index = tape.size();
+		auto mark = tree[get<A>()].index;
+		tree[get<A>()].index = tree.size();
 		get<A>() = mark;
 	}
 };
