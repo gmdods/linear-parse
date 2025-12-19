@@ -23,23 +23,25 @@ using tape_t = std::vector<item_t>;
 template <uint8_t A, uint8_t... Args>
 struct index;
 
+template <uint8_t A, uint8_t... Args>
+struct index<A, A, Args...> {
+	static constexpr int64_t value = 0;
+};
+
 template <uint8_t A, uint8_t B, uint8_t... Args>
 struct index<A, B, Args...> {
-	static constexpr int64_t value =
-		(A == B) ? 0 : 1 + index<A, Args...>::value;
+	static constexpr int64_t value = 1 + index<A, Args...>::value;
 };
 
 template <uint8_t A>
-struct index<A> {
-	static constexpr int64_t value = -1;
-};
+struct index<A>;
 
 template <uint8_t A, uint8_t... Args>
 static constexpr int64_t index_v = index<A, Args...>::value;
 
 template <uint8_t... Args>
 struct delim_t {
-	using array_t = std::array<int64_t, sizeof...(Args) + 1>;
+	using array_t = std::array<int64_t, sizeof...(Args)>;
 	array_t array_ = {0};
 
 	delim_t() : array_{init()} {}
